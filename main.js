@@ -53,14 +53,17 @@ function displayDropBoxes() {
 
 // Drag and Drop Handlers
 let draggedWord = null;
+let sourceContainer = null;
 
 function handleDragStart(event) {
   draggedWord = event.target;
+  sourceContainer = event.target.parentElement;
 }
 
 function handleDragStartFromBox(event) {
   if (event.target.textContent) {
     draggedWord = event.target;
+    sourceContainer = event.target;
   }
 }
 
@@ -69,42 +72,32 @@ function handleDrop(event) {
   if (draggedWord) {
     // If dropping into a drop box
     if (event.target.classList.contains("drop-box")) {
-      // If the target drop box already has a word, swap them
+      // If the target drop box already has a word, reset it
       if (event.target.textContent) {
-        const temp = event.target.textContent;
-        event.target.textContent = draggedWord.textContent;
-        draggedWord.textContent = temp;
-      } else {
-        event.target.textContent = draggedWord.textContent;
-        draggedWord.textContent = "";
+        resetDropBox(event.target);
       }
+
+      // Place the dragged word into the drop box
+      event.target.textContent = draggedWord.textContent;
       checkPosition(event.target);
-    }
 
-    // If dropping into the shuffled words container
-    if (event.target === shuffledWordsContainer && draggedWord.classList.contains("drop-box")) {
-      resetWordToShuffled(draggedWord);
-    }
+      // Remove the dragged word from the source container if it's the shuffled list
+      if (sourceContainer === shuffledWordsContainer) {
+        draggedWord.remove();
+      } else if (sourceContainer.classList.contains("drop-box")) {
+        sourceContainer.textContent = "";
+        sourceContainer.classList.remove("correct", "incorrect");
+      }
 
-    if (draggedWord.classList.contains("drop-box")) {
-      checkPosition(draggedWord);
+      draggedWord = null;
     }
-    draggedWord = null;
   }
 }
 
-// Reset word back to shuffled words container
-function resetWordToShuffled(dropBox) {
-  if (dropBox.textContent) {
-    const wordElem = document.createElement("div");
-    wordElem.classList.add("word");
-    wordElem.textContent = dropBox.textContent;
-    wordElem.draggable = true;
-    wordElem.addEventListener("dragstart", handleDragStart);
-    shuffledWordsContainer.appendChild(wordElem);
-    dropBox.textContent = "";
-    dropBox.classList.remove("correct", "incorrect");
-  }
+// Reset a drop box to its original state
+function resetDropBox(dropBox) {
+  dropBox.textContent = "";
+  dropBox.classList.remove("correct", "incorrect");
 }
 
 // Check if the word is in the correct position
@@ -126,6 +119,8 @@ hintBtn.addEventListener("click", () => {
     const index = Array.from(guessZone.children).indexOf(emptyBox);
     emptyBox.textContent = originalWords[index];
     emptyBox.classList.add("correct");
+
+    // Remove the word from the shuffled list
     const wordElem = Array.from(shuffledWordsContainer.children).find(
       (elem) => elem.textContent === originalWords[index]
     );
