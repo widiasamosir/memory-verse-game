@@ -22,6 +22,7 @@ startBtn.addEventListener("click", () => {
   gameSection.classList.remove("hidden");
   hintMessage.textContent = "";
 
+  // Clear the input field after starting the game
   verseInput.value = "";
 });
 
@@ -113,6 +114,27 @@ function checkPosition(dropBox) {
     dropBox.classList.remove("correct");
   }
 }
+
+// Allow words to be dragged back to the shuffled list
+shuffledWordsContainer.addEventListener("dragover", (e) => e.preventDefault());
+shuffledWordsContainer.addEventListener("drop", (e) => {
+  e.preventDefault();
+  if (draggedWord && sourceContainer !== shuffledWordsContainer) {
+    // Add the dragged word back to the shuffled list if dropped here
+    const wordElem = document.createElement("div");
+    wordElem.classList.add("word");
+    wordElem.textContent = draggedWord.textContent;
+    wordElem.draggable = true;
+    wordElem.addEventListener("dragstart", handleDragStart);
+    shuffledWordsContainer.appendChild(wordElem);
+
+    // Reset the drop box from which the word was dragged
+    sourceContainer.textContent = "";
+    sourceContainer.classList.remove("correct", "incorrect");
+
+    draggedWord = null;
+  }
+});
 
 // Hint Functionality
 hintBtn.addEventListener("click", () => {
