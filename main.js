@@ -21,6 +21,8 @@ startBtn.addEventListener("click", () => {
   displayDropBoxes();
   gameSection.classList.remove("hidden");
   hintMessage.textContent = "";
+
+  verseInput.value = "";
 });
 
 // Display shuffled words
