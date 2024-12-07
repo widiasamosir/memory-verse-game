@@ -140,15 +140,22 @@ shuffledWordsContainer.addEventListener("drop", (e) => {
 hintBtn.addEventListener("click", () => {
   const emptyBox = Array.from(guessZone.children).find((box) => !box.textContent);
   if (emptyBox) {
+    // Get the index of the empty drop box
     const index = Array.from(guessZone.children).indexOf(emptyBox);
-    emptyBox.textContent = originalWords[index];
-    emptyBox.classList.add("correct");
 
-    // Remove the word from the shuffled list
+    // Find the word from the shuffled list that should go in the current empty box
     const wordElem = Array.from(shuffledWordsContainer.children).find(
       (elem) => elem.textContent === originalWords[index]
     );
-    if (wordElem) wordElem.remove();
+
+    if (wordElem) {
+      // Place the word into the empty drop box
+      emptyBox.textContent = wordElem.textContent;
+      emptyBox.classList.add("correct");
+
+      // Remove the word from the shuffled list
+      wordElem.remove();
+    }
   } else {
     hintMessage.textContent = "All boxes are filled!";
   }
